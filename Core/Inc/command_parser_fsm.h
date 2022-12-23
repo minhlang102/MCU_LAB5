@@ -10,6 +10,7 @@
 
 #include "global.h"
 #include "main.h"
+#include "list.h"
 #include "stdio.h"
 #include "software_timer.h"
 #include "math.h"

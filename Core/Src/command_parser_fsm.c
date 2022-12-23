@@ -8,125 +8,128 @@
 #include "command_parser_fsm.h"
 
 uint32_t ADC_value;
-uint32_t invalid_char;
-
 
 void command_parser_fsm(ADC_HandleTypeDef hadc1) {
 	switch (state_parser) {
 		case INIT:
-			if (buffer[index_buffer-1] == '!') {
-				invalid_char = 0;
+			if (buffer_list->tail->data == '!') {
 				state_parser = S1;
+				buffer_list->tail->state = state_parser;
+			} else if (buffer_list->tail->data == '\b') {
+				delete(buffer_list);
+				delete(buffer_list);
 			}
-			break;
-		case STUFF:
-			if (buffer[index_buffer-1] == '\b') {
-				invalid_char--;
-				if (invalid_char == 0) {
-					state_parser = last_state;
-				}
-			} else {
-				invalid_char++;
+			if (buffer_list->size > 0 && buffer_list->tail->state != -1) {
+				state_parser = buffer_list->tail->state;
 			}
 			break;
 		case S1:
-			if (buffer[index_buffer-1] == 'R') {
+			if (buffer_list->tail->data == 'R') {
 				state_parser = S2;
-			} else if (buffer[index_buffer-1] == 'O') {
+				buffer_list->tail->state = state_parser;
+			} else if (buffer_list->tail->data == 'O') {
 				state_parser = S6;
-			} else if (buffer[index_buffer-1] == '!') {
+				buffer_list->tail->state = state_parser;
+			} else if (buffer_list->tail->data == '!') {
 				state_parser = S1;
-			} else if (buffer[index_buffer-1] == '\b') {
+				buffer_list->tail->state = state_parser;
+			} else if (buffer_list->tail->data == '\b') {
+				delete(buffer_list);
+				delete(buffer_list);
 				state_parser = INIT;
 			} else {
-				invalid_char++;
-				last_state = S1;
-				state_parser = STUFF;
+				state_parser = INIT;
 			}
 			break;
 		case S2:
-			if (buffer[index_buffer-1] == 'S') {
+			if (buffer_list->tail->data == 'S') {
 				state_parser = S3;
-			} else if (buffer[index_buffer-1] == '\b') {
+				buffer_list->tail->state = state_parser;
+			} else if (buffer_list->tail->data == '\b') {
+				delete(buffer_list);
+				delete(buffer_list);
 				state_parser = S1;
 			} else {
-				invalid_char++;
-				last_state = S2;
-				state_parser = STUFF;
+				state_parser = INIT;
 			}
 			break;
 		case S3:
-			if (buffer[index_buffer-1] == 'T') {
+			if (buffer_list->tail->data == 'T') {
 				state_parser = S4;
-			} else if (buffer[index_buffer-1] == '\b') {
+				buffer_list->tail->state = state_parser;
+			} else if (buffer_list->tail->data == '\b') {
+				delete(buffer_list);
+				delete(buffer_list);
 				state_parser = S2;
 			} else {
-				invalid_char++;
-				last_state = S3;
-				state_parser = STUFF;
+				state_parser = INIT;
 			}
 			break;
 		case S4:
-			if (buffer[index_buffer-1] == '#') {
+			if (buffer_list->tail->data == '#') {
 				state_parser = S5;
-			} else if(buffer[index_buffer-1] == '\b') {
+				buffer_list->tail->state = state_parser;
+			} else if(buffer_list->tail->data == '\b') {
+				delete(buffer_list);
+				delete(buffer_list);
 				state_parser = S3;
 			} else {
-				invalid_char++;
-				last_state = S4;
-				state_parser = STUFF;
+				state_parser = INIT;
 			}
 			break;
 		case S5:
-			if (buffer[index_buffer-1] == '\r') {
+			if (buffer_list->tail->data == '\r') {
 				HAL_ADC_Start(&hadc1);
 				ADC_value = ceil(HAL_ADC_GetValue(&hadc1));
 				sprintf(data, "!ADC=%d#\r\n", ADC_value);
 				command_flag = 1;
 				sprintf(command_data, "%s", "!RST#");
-				invalid_char = 0;
+				clear(buffer_list);
 				state_parser = INIT;
-			} else if (buffer[index_buffer-1] == '\b') {
+			} else if (buffer_list->tail->data == '\b') {
+				delete(buffer_list);
+				delete(buffer_list);
 				state_parser = S4;
 			} else {
-				invalid_char++;
-				last_state = S5;
-				state_parser = STUFF;
+				state_parser = INIT;
 			}
 			break;
 		case S6:
-			if (buffer[index_buffer-1] == 'K') {
+			if (buffer_list->tail->data == 'K') {
 				state_parser = S7;
-			} else if (buffer[index_buffer-1] == '\b') {
+				buffer_list->tail->state = state_parser;
+			} else if (buffer_list->tail->data == '\b') {
+				delete(buffer_list);
+				delete(buffer_list);
 				state_parser = S1;
 			} else {
-				invalid_char++;
-				last_state = S6;
-				state_parser = STUFF;
+				state_parser = INIT;
 			}
 			break;
 		case S7:
-			if (buffer[index_buffer-1] == '#') {
+			if (buffer_list->tail->data == '#') {
 				state_parser = S8;
-			} else if (buffer[index_buffer-1] == '\b') {
+				buffer_list->tail->state = state_parser;
+			} else if (buffer_list->tail->data == '\b') {
+				delete(buffer_list);
+				delete(buffer_list);
 				state_parser = S6;
 			} else {
-				invalid_char++;
-				last_state = S7;
-				state_parser = STUFF;
+				state_parser = INIT;
 			}
 			break;
 		case S8:
-			if (buffer[index_buffer-1] == '\r') {
+			if (buffer_list->tail->data == '\r') {
 				command_flag = 0;
 				sprintf(command_data, "%s", "!OK#");
+				clear(buffer_list);
 				state_parser = INIT;
-			} else if (buffer[index_buffer-1] == '\b') {
+			} else if (buffer_list->tail->data == '\b') {
+				delete(buffer_list);
+				delete(buffer_list);
 				state_parser = S7;
 			} else {
-				invalid_char++;
-				last_state = S8;
-				state_parser = STUFF;
+				state_parser = INIT;
 			}
 			break;
 		default:

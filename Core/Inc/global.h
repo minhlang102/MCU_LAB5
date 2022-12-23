@@ -9,6 +9,7 @@
 #define INC_GLOBAL_H_
 
 #include "main.h"
+#include "list.h"
 #include "stm32f1xx_hal_adc.h"
 #include "stm32f1xx_hal_uart.h"
 
@@ -27,8 +28,8 @@
 #define MAX_BUFFER_SIZE		30
 #define MAX_DATA_SIZE 		5
 
-extern uint8_t state_parser;
-extern uint8_t state_uart;
+extern int8_t state_parser;
+extern int8_t state_uart;
 extern uint8_t temp;
 extern uint8_t buffer[MAX_BUFFER_SIZE];
 extern uint8_t index_buffer;
@@ -36,6 +37,6 @@ extern uint8_t buffer_flag;
 extern uint8_t command_flag;
 extern uint8_t command_data[6];
 extern uint8_t data[12];
-extern uint8_t last_state;
+extern struct list* buffer_list;
 
 #endif /* INC_GLOBAL_H_ */
