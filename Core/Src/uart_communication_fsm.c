@@ -15,7 +15,7 @@ void uart_communication_fsm(UART_HandleTypeDef huart2) {
 			}
 			break;
 		case SEND:
-			HAL_UART_Transmit(&huart2, (void *) command_data, 12, 1000);
+			HAL_UART_Transmit(&huart2, (void *) data, 12, 1000);
 			setTimer2(3000);
 			state_uart = WAIT;
 			break;

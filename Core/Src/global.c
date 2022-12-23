@@ -14,6 +14,8 @@ uint8_t temp = 0;
 uint8_t index_buffer = 0;
 uint8_t buffer_flag = 0;
 uint8_t command_flag = 0;
-uint8_t command_data[12];
+uint8_t command_data[6];
+uint8_t data[12];
+uint8_t last_state = 0;
 
 
