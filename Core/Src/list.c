@@ -33,9 +33,6 @@ void delete(struct list* p) {
 	if (p->size <= 0) {
 		return;
 	}
-	if (p->size == 0) {
-		return;
-	}
 	if (p->size == 1) {
 		p->head->data = "\0";
 		free(p->head);

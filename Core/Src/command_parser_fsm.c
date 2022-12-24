@@ -19,9 +19,6 @@ void command_parser_fsm(ADC_HandleTypeDef hadc1) {
 				delete(buffer_list);
 				delete(buffer_list);
 			}
-			if (buffer_list->size > 0 && buffer_list->tail->state != -1) {
-				state_parser = buffer_list->tail->state;
-			}
 			break;
 		case S1:
 			if (buffer_list->tail->data == 'R') {
@@ -36,9 +33,9 @@ void command_parser_fsm(ADC_HandleTypeDef hadc1) {
 			} else if (buffer_list->tail->data == '\b') {
 				delete(buffer_list);
 				delete(buffer_list);
-				state_parser = INIT;
+				state_parser = buffer_list->tail->state;
 			} else {
-				state_parser = INIT;
+				state_parser = STUFF;
 			}
 			break;
 		case S2:
@@ -50,7 +47,7 @@ void command_parser_fsm(ADC_HandleTypeDef hadc1) {
 				delete(buffer_list);
 				state_parser = S1;
 			} else {
-				state_parser = INIT;
+				state_parser = STUFF;
 			}
 			break;
 		case S3:
@@ -62,7 +59,7 @@ void command_parser_fsm(ADC_HandleTypeDef hadc1) {
 				delete(buffer_list);
 				state_parser = S2;
 			} else {
-				state_parser = INIT;
+				state_parser = STUFF;
 			}
 			break;
 		case S4:
@@ -74,7 +71,7 @@ void command_parser_fsm(ADC_HandleTypeDef hadc1) {
 				delete(buffer_list);
 				state_parser = S3;
 			} else {
-				state_parser = INIT;
+				state_parser = STUFF;
 			}
 			break;
 		case S5:
@@ -91,7 +88,7 @@ void command_parser_fsm(ADC_HandleTypeDef hadc1) {
 				delete(buffer_list);
 				state_parser = S4;
 			} else {
-				state_parser = INIT;
+				state_parser = STUFF;
 			}
 			break;
 		case S6:
@@ -103,7 +100,7 @@ void command_parser_fsm(ADC_HandleTypeDef hadc1) {
 				delete(buffer_list);
 				state_parser = S1;
 			} else {
-				state_parser = INIT;
+				state_parser = STUFF;
 			}
 			break;
 		case S7:
@@ -115,13 +112,13 @@ void command_parser_fsm(ADC_HandleTypeDef hadc1) {
 				delete(buffer_list);
 				state_parser = S6;
 			} else {
-				state_parser = INIT;
+				state_parser = STUFF;
 			}
 			break;
 		case S8:
 			if (buffer_list->tail->data == '\r') {
 				command_flag = 0;
-				sprintf(command_data, "%s", "!OK#");
+				sprintf(command_data, "%s	", "!OK#");
 				clear(buffer_list);
 				state_parser = INIT;
 			} else if (buffer_list->tail->data == '\b') {
@@ -129,9 +126,18 @@ void command_parser_fsm(ADC_HandleTypeDef hadc1) {
 				delete(buffer_list);
 				state_parser = S7;
 			} else {
-				state_parser = INIT;
+				state_parser = STUFF;
 			}
 			break;
+		case STUFF:
+			if (buffer_list->tail->data == '!') {
+				state_parser = S1;
+				buffer_list->tail->state = state_parser;
+			} else if (buffer_list->tail->data == '\b') {
+				delete(buffer_list);
+				delete(buffer_list);
+				state_parser = buffer_list->tail->state;
+			}
 		default:
 			break;
 	}

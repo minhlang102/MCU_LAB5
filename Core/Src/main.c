@@ -71,7 +71,7 @@ uint8_t c[2];
 
 void HAL_UART_RxCpltCallback ( UART_HandleTypeDef * huart ){
 	if(huart -> Instance == USART2 ){
-//		HAL_UART_Transmit(&huart2 , &temp , 1, 50);
+		HAL_UART_Transmit(&huart2 , &temp , 1, 50);
 		insert(buffer_list, temp);
 		buffer_flag = 1;
 		HAL_UART_Receive_IT	(&huart2 , &temp , 1);
@@ -127,10 +127,11 @@ int main(void)
 	  }
 	  if (buffer_flag == 1) {
 		  command_parser_fsm(hadc1);
-			sprintf(c,"%d ",buffer_list->tail->state);
-			HAL_UART_Transmit(&huart2 , &c , 4, 50);
-			sprintf(c,"%c\r\n",temp);
-			HAL_UART_Transmit(&huart2 , &c , 4, 50);
+//For debug
+//			sprintf(c,"%d ",buffer_list->tail->state);
+//			HAL_UART_Transmit(&huart2 , &c , 4, 50);
+//			sprintf(c,"%c\r\n",temp);
+//			HAL_UART_Transmit(&huart2 , &c , 4, 50);
 		  buffer_flag = 0;
 	  }
 	  uart_communication_fsm(huart2);
