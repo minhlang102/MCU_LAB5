@@ -23,6 +23,7 @@
 /* USER CODE BEGIN Includes */
 #include "stdio.h"
 #include "string.h"
+#include "list.h"
 #include "software_timer.h"
 #include "global.h"
 #include "command_parser_fsm.h"
@@ -67,12 +68,11 @@ static void MX_TIM2_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 uint8_t c[2];
+
 void HAL_UART_RxCpltCallback ( UART_HandleTypeDef * huart ){
 	if(huart -> Instance == USART2 ){
-//		HAL_UART_Transmit(&huart2 , &temp , 1, 50);
-		buffer[index_buffer] = temp;
-		index_buffer += 1;
-		if (index_buffer == 30) index_buffer = 0;
+		HAL_UART_Transmit(&huart2 , &temp , 1, 50);
+		insert(buffer_list, temp);
 		buffer_flag = 1;
 		HAL_UART_Receive_IT	(&huart2 , &temp , 1);
 	}
@@ -86,6 +86,7 @@ void HAL_UART_RxCpltCallback ( UART_HandleTypeDef * huart ){
 int main(void)
 {
   /* USER CODE BEGIN 1 */
+	buffer_list = (struct list*)malloc(sizeof(struct list));
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -116,6 +117,7 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  struct list* tmp = (struct list*)malloc(sizeof(struct list));
   setTimer1(1000);
   while (1)
   {
@@ -125,10 +127,11 @@ int main(void)
 	  }
 	  if (buffer_flag == 1) {
 		  command_parser_fsm(hadc1);
-			sprintf(c,"%d ",state_parser);
-			HAL_UART_Transmit(&huart2 , &c , 4, 50);
-			sprintf(c,"%d\r\n",last_state);
-			HAL_UART_Transmit(&huart2 , &c , 4, 50);
+//For debug
+//			sprintf(c,"%d ",buffer_list->tail->state);
+//			HAL_UART_Transmit(&huart2 , &c , 4, 50);
+//			sprintf(c,"%c\r\n",temp);
+//			HAL_UART_Transmit(&huart2 , &c , 4, 50);
 		  buffer_flag = 0;
 	  }
 	  uart_communication_fsm(huart2);

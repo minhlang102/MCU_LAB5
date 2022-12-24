@@ -1,0 +1,3 @@
+../Core/Src/list.c:10:6:insert	24	static
+../Core/Src/list.c:32:6:delete	16	static
+../Core/Src/list.c:52:6:clear	16	static
